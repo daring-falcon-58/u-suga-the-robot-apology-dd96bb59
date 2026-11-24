@@ -65,11 +65,16 @@ def validate(text: str) -> None:
     if text != text.strip() or not text.strip():
         raise ValueError("entry must not be only whitespace")
     # Exactly two lines, one sentence each: exactly one newline, exactly
-    # two sentence-terminating periods, no '!' or '?' anywhere.
+    # two sentence-terminating periods, no '!' or '?' anywhere — and each
+    # line must hold exactly one period, so neither line hides a second
+    # sentence behind a comma or a dash.
     if text.count("\n") != 1:
         raise ValueError(f"entry must have exactly 1 newline, got {text.count(chr(10))}")
     if text.count(".") != 2:
         raise ValueError(f"entry must have exactly 2 periods, got {text.count('.')}")
+    for i, line in enumerate(text.split("\n"), 1):
+        if line.count(".") != 1 or not line.endswith("."):
+            raise ValueError(f"line {i} must be exactly one sentence ending in a period")
     if "!" in text or "?" in text:
         raise ValueError("entry must contain no '!' or '?'")
     if text.endswith("\n"):
